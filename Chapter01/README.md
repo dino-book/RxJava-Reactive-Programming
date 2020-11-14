@@ -212,3 +212,50 @@ RxJava에서는 개발자가 직접 스레드를 관리하지 않게 각 처리 
 <br />
 
 스케줄러는 데이터를 생성해 통지하는 부분과 데이터를 받아 처리하는 부분에 지정할 수 있다. 전자는 데이터 생성의 기본이 되는 생산자(Flowable, Observable)를 말하는 것으로, 생성 메서드에서 생성한 Flowable/Observable이 데이터 통지를 어떤 스케줄러에서 처리할지를 제어한다. 후자는 데이터의 필터나 변환을 하는 메서드와 소비자(Subscriber/Observer) 등이 데이터의 수신 처리를 어느 스케줄러에서 할지를 제어한다. 데이터를 통지하는 측과 받는 측은 데이터 통지 시에만 데이터를 주고 받아야 하며, 그 이외의 요인으로 서로의 행동에 영향을 주지 않아야 한다.
+
+```java
+// 외부 영향을 받는 예제
+
+// 계산 방법을 나타내는 enum 객체
+private enum State {
+    ADD, MULTIPLY;
+};
+
+// 계산 방법
+private static State calcMethod;
+
+public static void main(String[] args) throws Exception {
+    // 계산 방법을 덧셈으로 설정한다.
+    calcMethod = State.ADD;
+    
+    Flowable<Long> flowable =
+        // 300밀리초마다 데이터를 통지하는 flowable을 생성한다.
+        Flowable.interval(300L, TimeUnit.MILLISECONDS)
+        // 7건까지 통지한다.
+        .take(7)
+        // 각 데이터를 계산한다.
+        .scan((sum, data) -> {
+            if (calcMethod == State.ADD) {
+                return sum + data;
+            } else {
+                return sum * data;
+            }
+        });
+    
+    // 구독하고 받은 데이터를 출력한다.
+    flowable.subscribe(data -> System.out.println("data=" + data));
+    
+    // 잠시 기다렸다가 계산 방법을 곱셈으로 변경한다.
+    Thread.sleep(1000);
+    System.out.println("계산 방법 변경");
+    calcMethod = State.MULTIPLY;
+    
+    // 잠시 기다린다.
+    Thread.sleep(2000);
+}
+```
+
+<br />
+
+비동기로 처리할 때는 생산자에서 소비자까지의 처리가 노출되지 않게 폐쇄적으로 개발하면 어느 정도 위험을 줄일 수 있다. 기본적으로는 생산자가 외부에서 데이터를 받아 데이터를 생성할 때와 소비자가 받은 데이터를 처리하고  외부에 반영할 때만 외부 데이터를 참조하는 것이 좋다.
+
