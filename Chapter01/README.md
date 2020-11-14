@@ -271,3 +271,22 @@ RxJava에서 생성 메서드로 생성된 생산자는 기본적으로 Cold 생
 
 <br />
 
+### ConnectableFlowable/ConnectableObservable
+
+`ConnectableFlowable/ConnectableObservable`은 Hot Flowable/Observable이며, 여러 Subscriber/Observer에서 동시에 구독할 수 있다. 또한, Cold와 달리 `subscribe()` 메서드를 호출해도 처리를 시작하지 않고 `connect()` 메서드를 호출해야 처리를 시작한다. 그래서 처리를 시작하기 전에 여러 Subscriber/Observer에서 구독하게 하고 그 후 처리를 시작해 처음부터 동시에 여러 구독자에게 데이터를 통지할 수 있다.
+
+<br />
+
+#### refCount
+
+`refCount()` 메서드는 ConnectableFlowable/ConnectableObservable에서 새로운 Flowable/Observable을 생성한다. 이 Flowable/Observable은 이미 다른 소비자가 구독하고 있다면 도중에 구독하더라도 같은 타임라인에서 생성되는 데이터를 통지한다. refCount() 메서드에서 생성한 Flowable/Observable은 더 이상 ConnectableFlowable/ConnectableObservable이 아니므로 connect() 메서드가 없다. 그러므로 아직 구독 상태가 아니라면 subscribe() 메서드가 호출될 때 처리를 시작한다. 또한, refCount() 메서드로 생성한 Flowable/Observable은 처리가 완료된 뒤 또는 모든 구독이 해지된 뒤에는 다시 subscribe 메서드를 호출해도 처리가 다시 시작되지 않는다.
+
+<br />
+
+#### autoConnect
+
+`autoConnect()` 메서드는 ConnectableFlowable/ConnectableObservable에서 지정한 개수의 구독이 시작된 시점에 처리를 시작하는 Flowable/Observable을 생성한다. autoConnect() 메서드에서 인자 없이 생성한다면 처음 subscribe() 메서드가 호출된 시점에 처리를 시작하고, autoConnect() 메서드에서 인자로 구독 개수를 지정한다면 지정한 개수에 도달한 시점에서 처리를 시작한다. autoConnect() 메서드로 생성한 Flowable/Observable은 처리가 완료된 뒤 또는 모든 구독이 해지된 뒤에는 다시 subscribe 메서드를 호출해도 처리가 다시 시작되지 않는다.
+
+<br />
+
+### Flowable/Observable을 Cold에서 Hot으로 변환하는 연산자
