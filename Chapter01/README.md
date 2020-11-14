@@ -290,3 +290,19 @@ RxJava에서 생성 메서드로 생성된 생산자는 기본적으로 Cold 생
 <br />
 
 ### Flowable/Observable을 Cold에서 Hot으로 변환하는 연산자
+
+#### publish
+
+`publish()` 메서드는 원래 Cold인 Flowable/Observable에서 ConnectableFlowable/ConnectableObservable을 생성하는 연산자다. 이 메서드로 생성한 ConnectableFlowable/ConnectableObservable은 처리를 시작한 뒤에 구독하면 구독한 이후에 생성된 데이터부터 새로운 소비자에게 통지한다.
+
+<br />
+
+#### replay
+
+`replay()` 메서드는 publish()처럼 원래 Cold인 Flowable/Observable에서 ConnectableFlowable/ConnectableObservable을 생성한다. 이 메서드로 생성한 ConnectableFlowable/ConnectableObservable은 통지한 데이터를 캐시하고, 처리를 시작한 뒤에 구독하면 캐시된 데이터를 먼저 새로 구독한 소비자에게 통지한다. 그 뒤에는 모든 소비자에게 같은 데이터를 통지한다. replay() 메서드는 인자가 없으면 모든 데이터를 캐시하고, 인자가 있으면 인자로 지정한 시간 동안 지정한 개수만큼의 데이터를 캐시한다.
+
+<br />
+
+#### share
+
+`share()` 메서드는 여러 소비자가 구독할 수 있는 Flowable/Observable을 생성한다. 다른 메서드와 달리 ConnectableFlowable/ConnectableObservable을 생성하지 않는다. 이 share() 메서드에서 생성한 Flowable/Observable은 구독하는 소비자가 있는 동안은 도중에 새로 구독해도 같은 타임라인에서 생성되는 데이터를 통지한다. 즉, 실질적으로는 `flowable.publish().refCount()`와 같다.
