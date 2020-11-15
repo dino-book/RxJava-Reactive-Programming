@@ -493,3 +493,135 @@ public static void main(String[] args) throws Exception {
 ### Single/Maybe/Completable
 
 Single은 통지할 데이터가 반드시 1건 있을 때, Maybe는 데이터가 없거나 있다면 반드시 1건일 때, Completable은 데이터는 통지하지 않고 완료만 통지한다. Maybe는 데이터가 있으면 해당 데이터를 통지하고 처리를 종료하며, 데이터가 없으면 완료를 통지하고 처리를 종료한다. 또한, 이 클래스들은 처리 중에 에러가 발생하면 에러를 통지한다.
+
+그래서 이 클래스들은 Flowable과 Observable처럼 데이터 통지와 완료 통지가 나누어져 있지 않고 데이터 통지 자체가 완료르 의미하거나 데이터 통지 없이 완료 통지만 한다. 그리고 각 클래스의 통지에 대응하는 소비자가 필요한데, 일반적인 Subscriber와 Observer는 사용하지 못하고 독자적인 소비자를 제공한다.
+
+##### Single, Maybe, Completable의 소비자
+
+- Single : SingleObserver
+- Maybe : MaybeObserver
+- Completable : CompletableObserver
+
+<br />
+
+#### Single
+
+Single은 데이터를 1건만 통지하거나 에러를 통지하는 클래스로, 데이터 통지가 처리 완료를 의미하기 때문에 완료 통지는 하지 않는다. 따라서 Single의 통지 프로토콜에는 onNext와 onComplete가 없으며, 1건의 데이터를 통지하고 완료했음을 의미하는 통지 프로토콜인 onSuccess를 제공한다. 데이터를 1건만 통지하므로 데이터 개수를 요청할 필요가 없다.
+
+```java
+public static void main(String[] args) throws Exception {
+        // Single 생성
+        Single<DayOfWeek> single = Single.create( emitter -> {
+            emitter.onSuccess(LocalDate.now().getDayOfWeek());
+        });
+
+        // 구독
+        single.subscribe(new SingleObserver<DayOfWeek>() {
+
+            // 구독 준비가 됐을 때의 처리
+            @Override
+            public void onSubscribe(@NotNull Disposable d) {
+                // do nothing
+            }
+
+            // 데이터 통지를 받았을 때의 처리
+            @Override
+            public void onSuccess(@NotNull DayOfWeek dayOfWeek) {
+                System.out.println(dayOfWeek);
+            }
+
+            // 에러 통지를 받았을 때의 처리
+            @Override
+            public void onError(@NotNull Throwable e) {
+                System.out.println("Error = " + e);
+            }
+        });
+    }
+```
+
+<br />
+
+#### Maybe
+
+Maybe는 데이터를 1건만 통지하거나, 1건도 통지하지 않고 완료를 통지하거나, 에러를 통지하는 클래스다. 그래서 Maybe에서는 데이터 통지가 처리 완료를 의미하므로 굳이 다시 완료 통지를 하지 않는다. Maybe가 완료 통지를 할 때는 데이터가 1건도 없이 처리가 정상적으로 종료될 때다. Flowable/Observable의 통지와 달리 Maybe는 정상적으로 처리를 종료할 때 반드시 완료 통지(onComplete())를 호출하지는 않는다는 뜻이다. onComplete() 메서드는 데이터를 통지하지 않고 처리를 끝낼 때 사용한다.
+
+```java
+public static void main(String[] args) {
+        // Maybe 생성
+        Maybe<DayOfWeek> maybe = Maybe.create(emitter -> {
+            emitter.onSuccess(LocalDate.now().getDayOfWeek());
+        });
+
+        // 구독
+        maybe.subscribe(new MaybeObserver<DayOfWeek>() {
+
+            // 구독 준비가 됐을 때의 처리
+            @Override
+            public void onSubscribe(@NotNull Disposable d) {
+                // do nothing
+            }
+
+            // 데이터 통지를 받을 때의 처리
+            @Override
+            public void onSuccess(@NotNull DayOfWeek dayOfWeek) {
+                System.out.println(dayOfWeek);
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+                System.out.println("Error = " + e);
+            }
+
+            @Override
+            public void onComplete() {
+                System.out.println("완료");
+            }
+        });
+    }
+```
+
+<br />
+
+#### Completable
+
+Completable은 데이터를 통지하지 않고 완료나 에러를 통지하는 클래스다. 이 클래스는 생산자가 되는 다른 클래스와 달리 데이터를 통지하지 않는다. 그래서 Completable은 생산자 클래스와 역할이 다르며, Completable 내에서 특정 부가 작용이 발생하는 처리를 수행한다. 그리고 해당 처리가 끝나면 완료를 통지하고, 에러가 발생하면 에러를 통지한다. 따라서 Completable을 사용할 때 부가 작용 처리의 구독을 호출하는 스레드와 동일한 스레드에서 실행한다면 RxJava를 사용하지 않을 때와 동일해져서 Completable을 사용하는 의미가 없다.
+
+```java
+public static void main(String[] args) throws Exception {
+        // Completable 생성
+        Completable completable = Completable.create(emitter -> {
+            // 중략(업무 로직 처리)
+
+            // 완료 통지
+            emitter.onComplete();
+        });
+
+        completable
+                // Completable을 비동기로 실행
+                .subscribeOn(Schedulers.computation())
+                // 구독
+                .subscribe(new CompletableObserver() {
+
+                    // 구독 준비가 되었을 때의 처리
+                    @Override
+                    public void onSubscribe(@NotNull Disposable d) {
+                        // do nothing
+                    }
+
+                    // 완료 통지를 받을 때의 처리
+                    @Override
+                    public void onComplete() {
+                        System.out.println("완료");
+                    }
+
+                    // 에러 통지를 받을 때의 처리
+                    @Override
+                    public void onError(@NotNull Throwable e) {
+                        System.out.println("Error = " + e);
+                    }
+                });
+
+        Thread.sleep(100L);
+    }
+```
+
