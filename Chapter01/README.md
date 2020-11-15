@@ -306,3 +306,190 @@ RxJava에서 생성 메서드로 생성된 생산자는 기본적으로 Cold 생
 #### share
 
 `share()` 메서드는 여러 소비자가 구독할 수 있는 Flowable/Observable을 생성한다. 다른 메서드와 달리 ConnectableFlowable/ConnectableObservable을 생성하지 않는다. 이 share() 메서드에서 생성한 Flowable/Observable은 구독하는 소비자가 있는 동안은 도중에 새로 구독해도 같은 타임라인에서 생성되는 데이터를 통지한다. 즉, 실질적으로는 `flowable.publish().refCount()`와 같다.
+
+<br />
+
+<br />
+
+## Rxjava의 전체 구성
+
+### RxJava의 기본 구성
+
+RxJava는 소비자(Subscriber/Observer)가 생산자(Flowable, Observable)를 구독하는 형태다. 이 생산자와 소비자의 관계는 Reactive Streams 사용을 지원하는 Flowable/Subscriber 구성과 지원하지 않는 Observable/Observer 구성으로 나눌 수 있다. 그리고 각각의 구성에는 통지하는 데이터의 생산자인 Flowable과 Observable, 통지받은 데이터의 소비자인 Subscriber와 Observer, 생산자와 소비자 사이에서 공유되는 Subscription과 Disposable이 있다.
+
+<br />
+
+#### Flowable/Observable
+
+Flowable과 Observable은 데이터를 생성하고 통지하는 클래스이며, Flowable에는 배압 기능이 있고 Observable에는 없다는 차이가 있다. Flowable과 Observable은 기본적으로 Reactive Streams의 규칙과 그 규칙에 영향을 준 Observable 규약을 따르지 않으면 데이터가 문제 없이 통지되는 것을 보장받지 못 한다.
+
+<br />
+
+##### 통지 시 규칙
+
+- null을 통지하면 안 된다.
+- 데이터 통지는 해도 되고, 안 해도 된다.
+- Flowable/Observable의 처리를 끝낼 때는 완료나 에러 통지를 해야 하며, 둘 다 통지하지는 않는다.
+- 완료나 에러 통지를 한 뒤에는 다른 통지를 해서는 안 된다.
+- 통지할 때는 1건씩 순차적으로 통지하며, 동시에 통지하면 안 된다.
+
+<br />
+
+#### Subscriber/Observer
+
+Subscriber와 Observer는 통지된 데이터를 전달받아 이 데이터를 처리하는 인터페이스다. Subscriber와 Observer의 메서드가 호출되는 정상적인 순서는 다음과 같다.
+
+- onSubscribe() 메서드
+- onNext() 메서드
+- onComplete() 메서드
+
+먼저 Subscriber/Observer가 구독한 Flowable/Observable의 통지가 준비되면 `onSubscribe()` 메서드가 호출되는데, onSubscribe() 메서드는 1건의 구독에서 한 번만 호출된다.
+
+다음으로 데이터가 통지될 때마다 `onNext()` 메서드가 호출된다. 여러 데이터가 통지되면 그만큼 onNext() 메서드가 호출되며 1건도 데이터가 통지되지 않으면 onNext() 메서드는 호출되지 않는다.
+
+그리고 모든 데이터를 통지한 뒤에 `onComplete()` 메서드를 호출해 완료를 통지한다. 이것은 데이터 스트림을 처리할 때 중요한데, 이벤트 처리의 구독을 시작한 시점에서는 해당 Flowable/Observable이 끝나지 않고 계속해서 데이터를 통지하는지 판단할 수 없다. 그래서 모든 데이터를 통지한 뒤에 더 이상 데이터가 없음을 알리고자 완료를 통지하며 이때 완료를 통지할 때의 처리를 할 수 있다. onComplete() 메서드도 1건의 구독에서 한 번만 실행되며, onComplete() 메서드가 실행되면 해당 구독은 그대로 종료된다.
+
+마지막으로 Flowable/Observable 처리 중에 에러가 발생하면 `onError()` 메서드가 호출돼 바로 처리가 종료된다.
+
+<br />
+
+원래 각 메서드는 하나씩 순서대로 실행되지만, Subscriber의 onSubscribe() 메서드만 예외적으로 처리 도중에 onNext() 메서드나 onComplete() 메서드가 실행된다. 이것은 onSubscribe() 메서드에서 Subscription의 request() 메서드를 호출하면 Flowable이 데이터 통지를 시작하기 때문이다.
+
+<br />
+
+#### Subscription
+
+Subscription은 Reactive Streams에 정의된 인터페이스로, 통지 데이터 개수를 요청하는 request() 메서드와 처리 도중에도 구독을 해지하는 cancel() 메서드를 포함한다. Subscription은 Subscriber의 onSubscribe() 메서드의 인자로 전달되는 객체며, 설정한 수만큼 데이터를 통지하게 Flowable에 요청하거나 구독을 해지하는 기능이 있다.
+
+```java
+public interface Subscription {
+    public void request(long n);
+    public void cancel();
+}
+```
+
+<br />
+
+#### Disposable
+
+Disposable은 구독을 해지하는 메서드를 포함한 인터페이스다. Observable과 Observer 간 구독에서 Observable이 구독 준비가 되면 onSubscribe() 메서드를 통해 Observer에 전달되는 객체며, 구독 처리 중에도 구독을 해지하는 기능이 있다.
+
+```java
+public interface Disposable {
+    void dispose();
+    boolean isDisposed();
+}
+```
+
+<br />
+
+또한 Disposable은 구독 해지뿐만 아니라 자원을 해제하는 등의 처리에도 활용할 수 있다. 따라서 처리가 끝날 때 자원을 해제해야 한다면 해제 처리를 Disposable의 dispose() 메서드에 구현한다. 그리고 FlowableEmitter/ObservableEmitter의 setDisposable 메서드에 이 Disposable을 설정하면 완료나 에러, 구독 해지 시에 Disposable의 dispose() 메서드가 호출된다. ResourceSubscriber/ResourceObserver의 add() 메서드로 Disposable을 추가하면 해당 ResourceSubscriber/ResourceObserver의 dispose() 호출 시 Disposable의 dispose() 메서드가 호출된다.
+
+<br />
+
+#### FlowableProcessor/Subject
+
+Processor는 Reactive Streams에 정의된 생산자와 소비자의 기능이 모두 있는 인터페이스다. 이 인터페이스는 Publisher와 Subscriber를 모두 상속받으며, 다른 세머드는 가지고 있지 않다.
+
+```java
+public abstract interface Processor<T, R> extends Subscriber<T>, Publisher<R> { }
+```
+
+<br />
+
+RxJava는 이 Reactive Streams의 Processor 구현 클래스로 FlowableProcessor를 제공한다. 그리고 Observable과 Observer의 구성에서 Processor와 같은 역할을 하는 Subject 인터페이스를  제공한다.
+
+<br />
+
+#### DisposableSubscriber/DisposableObserver
+
+DisposableSubscriber/DisposableObserver는 Disposable을 구현한 Subscriber/Observer의 구현 클래스로, 외부에서 비동기로 구독 해지 메서드를 호출해도 안전하게 구독 해지를 하게 한다. 이 클래스에는 onSubscribe() 메서드가 final 메서드로 구현되어 있으며, onSubscribe() 메서드로 전달되는 Subscription/Disposable은 직접 접근하지 못하게 은닉돼 있다.
+
+<br />
+
+##### DisposableSubscriber의 Subsciprion 메서드를 호출하는 메서드
+
+- **request(long)** : Subscription의 request() 메서드 호출
+- **dispose()** : Subscription의 dispose() 메서드 호출
+
+##### DisposableObserver의 Dispose 메서드를 호출하는 메서드
+
+- **dispose()** : Dispose의 dispose() 메서드 호출
+- **isDisposed()** : Dispose의 isDisposed() 메서드 호출 
+
+<br />
+
+구독 시작 시점에 원하는 처리를 실행하려면 onSubscribe() 메서드 내에서 호출되는 onStart() 메서드를 오버라이드 해 구현하면 된다.
+
+<br />
+
+#### ResourceSubscriber/ResourceObserver
+
+ResourceSubscriber/ResourceObserver도 DisposableSubscriber/DisposableObserver와 마찬가지로 Disposable을 구현한 Subscriber/Observer의 구현 클래스이며, 외부에서 비동기로 구독 해지 메서드를 호출하더라도 안전하게 구독 해지를 하게 한다. 그리고 DisposableSubscriber/DisposableObserver와 같은 기능 외에도 다른 Disposable을 보관할 수도 있게 add() 메서드를 제공한다. add() 메서드로 보관된 Disposable의 dispose() 메서드는 ResourceSubscriber/ResourceObserver의 dispose() 메서드가 호출되면 함께 호출된다. 하지만 완료나 에러가 발생할 때는 자동으로 호출되지 않으니 주의해야 한다.
+
+<br />
+
+#### subscribe/subscribeWith
+
+subscribe()는 소비자가 생산자를 구독하는 메서드로, 이 메서드를 호출하면 생산자가 데이터를 통지할 소비자를 등록한다. 생산자가 Cold일 때 subscibe 메서드를 호출하면 생산자는 바로 통지 처리를 시작한다. 구독 과정에서 통지 처리는 보통 다음 세 단계로 이루어진다.
+
+1. 구독 시작 시 초기화 처리(onSubscribe)
+2. 데이터 통지 처리(onNext)
+3. 통지 종료 처리(onComplete/onError)
+
+이러한 순서는 Subscriber/Observer 내에서 동기화돼야 하며, 순서대로 실행된다는 전제가 있다. 따라서 생산자의 처리와 소비자의 처리가 비동기로 이루어졌다고 해도 여러 데이터를 동시에 실행하는 일은 없다.
+
+<br />
+
+subscribeWith() 메서드는 Subscriber/Observer를 넘겨 주면 내부에서 이 Subscriber/Observer를 subscribe() 메서드에 전달해 실행하고 인자로 전달받은 Subscriber/Observer를 반환한다.
+
+```java
+public final <E extends Subscriber<? super T>> E subscribeWith(E subscriber) {
+    subscribe(subscriber);
+    return subscriber;
+}
+```
+
+<br />
+
+#### CompositeDisposable
+
+CompositeDisposable은 여러 Disposable을 모아 CompositeDisposable의 dispose() 메서드를 호출함으로써 가지고 있는 모든 Disposable의 dispose() 메서드를 호출할 수 있는 클래스다.
+
+```java
+public static void main(String[] args) throws Exception {
+        // Disposable을 합친다.
+        CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+        compositeDisposable.add(
+                Flowable.range(1, 3)
+                        .doOnCancel(() -> System.out.println("No.1 canceled"))
+                        .observeOn(Schedulers.computation())
+                .subscribe(data -> {
+                    Thread.sleep(100L);
+                    System.out.println("No.1 : " + data);
+                })
+        );
+
+        compositeDisposable.add(
+                Flowable.range(1, 3)
+                .doOnCancel(() -> System.out.println("No.2 canceled"))
+                .observeOn(Schedulers.computation())
+                .subscribe(data -> {
+                    Thread.sleep(100L);
+                    System.out.println("No.2 : " + data);
+                })
+        );
+
+        Thread.sleep(150L);
+
+        // 한번에 구독을 해지한다.
+        compositeDisposable.dispose();
+    }
+```
+
+<br />
+
+### Single/Maybe/Completable
+
+Single은 통지할 데이터가 반드시 1건 있을 때, Maybe는 데이터가 없거나 있다면 반드시 1건일 때, Completable은 데이터는 통지하지 않고 완료만 통지한다. Maybe는 데이터가 있으면 해당 데이터를 통지하고 처리를 종료하며, 데이터가 없으면 완료를 통지하고 처리를 종료한다. 또한, 이 클래스들은 처리 중에 에러가 발생하면 에러를 통지한다.

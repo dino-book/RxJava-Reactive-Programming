@@ -23,7 +23,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="56d40983-8ff6-48d2-930d-8d1f478311aa" name="Default Changelist" comment="구독을 중도 해지하는 Flowable 사용 예제">
+      <change beforePath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.3/javaCompile/classAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/javaCompile/classAnalysis.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.3/javaCompile/javaCompile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/javaCompile/javaCompile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,9 +91,16 @@
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="File.Encoding" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
-  <component name="RunManager" selected="Application.ObservableSample">
+  <component name="RunManager" selected="Application.CompositeDisposableSample">
+    <configuration name="CompositeDisposableSample" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="CompositeDisposableSample" />
+      <module name="Chapter01.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="FlowableSample" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="FlowableSample" />
       <module name="Chapter01.main" />
@@ -109,6 +124,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.CompositeDisposableSample" />
         <item itemvalue="Application.ObservableSample" />
         <item itemvalue="Application.SubscriprionCancelSample" />
         <item itemvalue="Application.FlowableSample" />
@@ -138,7 +154,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605421807250</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="구독을 중도 해지하는 Flowable 사용 예제">
+      <created>1605422462102</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1605422462102</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -159,6 +182,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="구독을 중도 해지하는 Flowable 사용 예제" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="872" y="341" key="#Plugins" timestamp="1605422694519">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="872" y="341" key="#Plugins/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605422694519" />
     <state x="1047" y="128" key="#Project_Structure" timestamp="1605372886862">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -167,22 +194,22 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1368" y="378" key="FileChooserDialogImpl/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605371552955" />
-    <state width="2517" height="401" key="GridCell.Tab.0.bottom" timestamp="1605421743761">
+    <state width="2517" height="316" key="GridCell.Tab.0.bottom" timestamp="1605439940338">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="2517" height="401" key="GridCell.Tab.0.bottom/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605421743761" />
-    <state width="2517" height="401" key="GridCell.Tab.0.center" timestamp="1605421743761">
+    <state width="2517" height="316" key="GridCell.Tab.0.bottom/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605439940338" />
+    <state width="2517" height="316" key="GridCell.Tab.0.center" timestamp="1605439940338">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="2517" height="401" key="GridCell.Tab.0.center/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605421743761" />
-    <state width="2517" height="401" key="GridCell.Tab.0.left" timestamp="1605421743760">
+    <state width="2517" height="316" key="GridCell.Tab.0.center/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605439940338" />
+    <state width="2517" height="316" key="GridCell.Tab.0.left" timestamp="1605439940338">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="2517" height="401" key="GridCell.Tab.0.left/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605421743760" />
-    <state width="2517" height="401" key="GridCell.Tab.0.right" timestamp="1605421743761">
+    <state width="2517" height="316" key="GridCell.Tab.0.left/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605439940338" />
+    <state width="2517" height="316" key="GridCell.Tab.0.right" timestamp="1605439940338">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="2517" height="401" key="GridCell.Tab.0.right/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605421743761" />
+    <state width="2517" height="316" key="GridCell.Tab.0.right/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605439940338" />
     <state width="2517" height="479" key="GridCell.Tab.1.bottom" timestamp="1605421709137">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -199,17 +226,21 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="2517" height="479" key="GridCell.Tab.1.right/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605421709137" />
-    <state x="1068" y="198" key="SettingsEditor" timestamp="1605373162502">
+    <state x="1068" y="198" key="SettingsEditor" timestamp="1605422519072">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1068" y="198" key="SettingsEditor/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605373162502" />
+    <state x="1068" y="198" key="SettingsEditor/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605422519072" />
     <state x="872" y="433" key="Vcs.Push.Dialog.v2" timestamp="1605421328539">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="872" y="433" key="Vcs.Push.Dialog.v2/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605421328539" />
-    <state x="1230" y="278" width="672" height="678" key="search.everywhere.popup" timestamp="1605368280715">
+    <state x="659" y="310" key="new project wizard" timestamp="1605422564715">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1230" y="278" width="672" height="678" key="search.everywhere.popup/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605368280715" />
+    <state x="659" y="310" key="new project wizard/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605422564715" />
+    <state x="1230" y="278" width="672" height="678" key="search.everywhere.popup" timestamp="1605422600620">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1230" y="278" width="672" height="678" key="search.everywhere.popup/-1920.0.1536.832/0.0.2560.1400@0.0.2560.1400" timestamp="1605422600620" />
   </component>
 </project>
